@@ -8,8 +8,7 @@ app.use(express.json());
 
 const userRoutes = require('./server/routes/user');
 const postRoutes = require('./server/routes/post');
-
-
+const followRoutes = require('./server/routes/follow');
 
 mongoose.connect(process.env.dbURL)
   .then(console.log("DB Connected!!"))
@@ -27,6 +26,8 @@ app.get('/', (req, res) => res.sendFile(path.join(__dirname, '/public', 'index.h
 
 app.use('/user', userRoutes);
 app.use('/post', postRoutes);
+app.use('/follow', followRoutes);
+
 
 
 const PORT = process.env.PORT || 3000;
