@@ -1,74 +1,48 @@
-
-const mongoose = require('mongoose');
-
+const mongoose = require("mongoose");
 
 const postSchema = new mongoose.Schema({
-  postId: {
-    type: String,
-    required: true,
-    unique: true
-  },
-  userId: {
+  userID: {
     type: mongoose.Schema.Types.ObjectId,
-    required: true,
-    ref: 'User'
+    ref: "User"
   },
-  title: {
-    type: String,
-    required: true
-  },
-  content: {
-    type: String,
-    required: true
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  }
-});
-
-// Create a Post model
-const Post = mongoose.model('Post', postSchema);
-
-// CRUD operations
-
-// Create a new post
-const createPost = async (postId, userId, title, content) => {
-  const post = new Post({
-    postId,
-    userId,
-    title,
-    content
+  posttitle: { type: String },
+  postcontent: { type: String },
+  postlikes: { type: String }
+}) 
+// 3. create model of schema
+const post = mongoose.model("post", postSchema);
+// 4. create CRUD functions on model
+//CREATE a post
+async function createpost(id, posttitle, postcontent) {
+  const newpost = await post.create({
+    userID: id,
+    posttitle: posttitle,
+    postcontent: postcontent,
+    postlikes: 0
   });
-  await post.save();
-};
+  return newpost;
 
-// Read a post by postId and userId
-const readPost = async (postId, userId) => {
-  const post = await Post.findOne({ postId, userId }).populate('userId');
+}
+// UPDATE
+async function updatepost(id, postcontent) {
+  const post = await post.updateOne({ "_id": id }, { $set: { postcontent: postcontent } });
   return post;
-};
 
-// Update an existing post by postId and userId
-const updatePost = async (postId, userId, updateData) => {
-  const post = await Post.findOneAndUpdate(
-    { postId, userId },
-    updateData,
-    { new: true }
-  );
-  return post;
-};
+}
+//DELETE
+async function deletepost(id) {
+  await post.deleteOne({ "_id": id });
+}
 
-// Delete a post by postId and userId
-const deletePost = async (postId, userId) => {
-  const post = await Post.findOneAndDelete({ postId, userId });
-  return post;
-};
+// GET post
+async function getpost(id) {
+  return await post.findOne({ "_id": id });
+}
 
-module.exports = {
-  Post,
-  createPost,
-  readPost,
-  updatePost,
-  deletePost
-};
+// GET post
+async function getUserPosts(id) {
+  const data = await post.find({ "userID": id });
+  return JSON.parse(JSON.stringify(data));
+}
+
+module.exports = { createpost, updatepost, deletepost, getpost, getUserPosts };

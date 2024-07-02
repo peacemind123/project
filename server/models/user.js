@@ -1,4 +1,3 @@
-
 // 1. import mongoose
 const mongoose = require("mongoose");
 const bcrypt = require('bcryptjs');
@@ -16,7 +15,7 @@ const User = mongoose.model("User", userSchema);
 
 // 4. create CRUD functions on model
 //CREATE a user
-async function register(username, password) {
+async function register(username, password) { 
   const user = await getUser(username);
   if(user) throw Error('Username already in use');
 
@@ -28,19 +27,21 @@ async function register(username, password) {
     password: hashed
   });
 
-  return newUser._doc;
+  return newUser;
 }
 
-// READ a user
+
 async function login(username, password) {
   const user = await getUser(username);
-  if(!user) throw Error('User not found');
-
+  if(!user) throw Error(`User not found: ${username}`);
   const isMatch = await bcrypt.compare(password, user.password);
-  if(!isMatch) throw Error('Wrong Password');
 
-  return user._doc;
+  if(!isMatch) throw Error(`Invalid login details for user: ${username}`);
+
+
+  return user;
 }
+
 
 // UPDATE
 async function updatePassword(id, password) {
@@ -55,10 +56,9 @@ async function deleteUser(id) {
 
 // utility functions
 async function getUser(username) {
-  return await User.findOne({ "username": username});
+  const userData = await User.findOne({ "username": username});
+  return JSON.parse(JSON.stringify(userData));
 }
 
 // 5. export all functions we want to access in route files
-module.exports = { 
-  register, login, updatePassword, deleteUser 
-};
+module.exports = {register,login, updatePassword, deleteUser};

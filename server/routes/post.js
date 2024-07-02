@@ -1,58 +1,51 @@
 const express = require('express');
+const post = require('../models/post');
 const router = express.Router();
-const Post= require('../models/post');
+router
+    .get('/:id', async (req, res) => {
+        try {
+            let retrievedPost = await post.getpost(req.params.id);
+            res.send(retrievedPost)
+        } catch (err) {
+            res.status(401).send({ message: err.message });
+        }
+    })
 
-// Route to create a new post
-router.post('/posts', async (req, res) => {
-  try {
-    const { title, content, userId } = req.body;
-    const post = await Post.createPost(title, content, userId);
-    res.status(201).json(post);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
+    .post('/', async (req, res) => {
+        try {
+            let createdPost = await post.createpost(req.body.id, req.body.title, req.body.content);
+            res.send(createdPost)
+        } catch (err) {
+            res.status(401).send({ message: err.message });
+        }
+    })
 
-// Route to read a post by User ID and Post ID
-router.get('/posts/:userId/:postId', async (req, res) => {
-  try {
-    const { userId, postId } = req.params;
-    const post = await Post.readPost(userId, postId);
-    if (post) {
-      res.status(200).json(post);
-    } else {
-      res.status(404).json({ message: 'Post not found' });
-    }
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
+    .put('/:id', async (req, res) => {
+        try {
+            let updatedPost = await post.updatepost(req.params.id, req.body.postcontent);
+            res.send(updatedPost)
+        } catch (err) {
+            res.status(401).send({ message: err.message });
+        }
+    })
 
-// Route to update a post by User ID and Post ID
-router.put('/posts/:userId/:postId', async (req, res) => {
-  try {
-    const { userId, postId } = req.params;
-    const { title, content } = req.body;
-    const updatedPost = await Post.updatePost(userId, postId, title, content);
-    if (updatedPost) {
-      res.status(200).json(updatedPost);
-    } else {
-      res.status(404).json({ message: 'Post not found' });
-    }
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
+    .delete('/:id', async (req, res) => {
+        try {
+            const deletedPost = await post.deletepost(req.params.id);
+            console.log('deletedPost', deletedPost);
+            res.status(200).send({ message: 'Post Deleted succesfully' });
+        } catch (err) {
+            res.status(401).send({ message: err.message });
+        }
+    })
 
-// Route to delete a post by User ID and Post ID
-router.delete('/posts/:userId/:postId', async (req, res) => {
-  try {
-    const { userId, postId } = req.params;
-    await Post.deletePost(userId, postId);
-    res.status(204).send();
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
+    .get('/user/:id', async (req, res) => {
+        try {
+            let list = await post.getUserPosts(req.params.id);
+            res.send(list)
+        } catch (err) {
+            res.status(401).send({ message: err.message });
+        }
+    })
 
 module.exports = router;

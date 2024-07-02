@@ -1,30 +1,34 @@
-import {BrowserRouter, Routes, Route} from "react-router-dom";
-import './App.css';
-import Loginform from './components/Loginform.js';
-import Navigation from './components/Navigation.js';
-import Registration from './components/Registration.js';
-import Profile from './components/Profile.js';
 
+import './App.css';
+import Register from './components/pages/Register';
+import Login from './components/pages/Login';
+import Navbar from './components/pages/Navbar';
+import Profile from './components/pages/Profile';
+import { UserProvider } from './context/userContext';
+
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+
+const defaultTheme = createTheme();
 
 function App() {
   return (
-    <div className="App">
-      <h1 id="headerid"><b>UI Project !!</b></h1>
-      <BrowserRouter>
-          <Routes>
-          <Route path='/' element={ <Navigation />}>
-      
-              <Route path="login" element={<Loginform />}/>
+    <ThemeProvider theme={defaultTheme}>
+      <div className="App">
+        <BrowserRouter>
+          <UserProvider>
+            <Routes>
+                <Route path='/' element={<Navbar />}>
+                  <Route path="login" element={<Login />} />
+                  <Route path="register" element={<Register />} />
+                  <Route path="profile" element={<Profile />} />
               
-              <Route path="register" element={<Registration />}/>
-
-              <Route path="profile" element={<Profile />}/>
-              
-              </Route>
-
-          </Routes>
+                </Route>
+            </Routes>
+          </UserProvider>
         </BrowserRouter>
-    </div>
+      </div>
+    </ThemeProvider>
   );
 }
 
